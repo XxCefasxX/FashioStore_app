@@ -23,7 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.cyberwalker.fashionstore.data.Favorites.FavoritesScreen
 import com.cyberwalker.fashionstore.data.Profile.Profile
+import com.cyberwalker.fashionstore.data.Search.SearchScreen
 import com.cyberwalker.fashionstore.detail.DetailScreen
 import com.cyberwalker.fashionstore.detail.DetailScreenActions
 import com.cyberwalker.fashionstore.dump.animatedComposable
@@ -42,6 +44,8 @@ sealed class Screen(val name: String, val route: String) {
     object Detail : Screen("detail", "detail")
     object Login : Screen("login", "login")
     object Profile : Screen("Profile", "Profile")
+    object Favorites : Screen("Liked", "Liked")
+    object Search : Screen("Search", "Search")
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -59,9 +63,9 @@ fun FashionNavGraph(
         modifier = modifier
     ) {
         animatedComposable(Screen.Splash.route) {
-            if(FirebaseAuth.getInstance().currentUser!=null){
+            if (FirebaseAuth.getInstance().currentUser != null) {
                 SplashScreen(onAction = actions::navigateToHome)
-            }else{
+            } else {
                 SplashScreen(onAction = actions::navigateToLogin)
             }
 
@@ -80,6 +84,12 @@ fun FashionNavGraph(
         }
         animatedComposable(Screen.Profile.route) {
             Profile(navController = navController)
+        }
+        animatedComposable(Screen.Search.route) {
+            SearchScreen(navController = navController)
+        }
+        animatedComposable(Screen.Favorites.route) {
+            FavoritesScreen(navController = navController)
         }
     }
 }
