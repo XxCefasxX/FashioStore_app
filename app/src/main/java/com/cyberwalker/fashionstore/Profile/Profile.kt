@@ -1,4 +1,4 @@
-package com.cyberwalker.fashionstore.data.Profile
+package com.cyberwalker.fashionstore.Profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button

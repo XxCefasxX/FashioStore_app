@@ -1,4 +1,4 @@
-package com.cyberwalker.fashionstore.data.Search
+package com.cyberwalker.fashionstore.Search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

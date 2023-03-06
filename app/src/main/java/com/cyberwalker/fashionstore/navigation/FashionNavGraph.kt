@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.cyberwalker.fashionstore.data.Favorites.FavoritesScreen
-import com.cyberwalker.fashionstore.data.Profile.Profile
-import com.cyberwalker.fashionstore.data.Search.SearchScreen
+import com.cyberwalker.fashionstore.Profile.Profile
+import com.cyberwalker.fashionstore.Search.SearchScreen
 import com.cyberwalker.fashionstore.detail.DetailScreen
 import com.cyberwalker.fashionstore.detail.DetailScreenActions
 import com.cyberwalker.fashionstore.dump.animatedComposable

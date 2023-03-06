@@ -15,7 +15,7 @@
  */
 package com.cyberwalker.fashionstore.data
 
-import com.cyberwalker.fashionstore.data.source.HomeRemoteSource
+import com.cyberwalker.fashionstore.source.HomeRemoteSource
 
 class HomeRepository(private val source: HomeRemoteSource) {
     fun get() = source.get()
