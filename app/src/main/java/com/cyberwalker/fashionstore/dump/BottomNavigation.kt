@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.cyberwalker.fashionstore.R
+import com.cyberwalker.fashionstore.home.HomeScreenActions
 import com.cyberwalker.fashionstore.navigation.Screen
 import com.cyberwalker.fashionstore.ui.theme.bottomNavbg
 import com.cyberwalker.fashionstore.ui.theme.highlight
@@ -53,7 +54,7 @@ fun BottomNav(navController: NavController, isDark: Boolean = isSystemInDarkThem
                 alwaysShowLabel = false,
                 selected = currentRoute == item.screen_route,
                 onClick = {
-
+                    navController.navigate(item.screen_route)
                 }
             )
         }

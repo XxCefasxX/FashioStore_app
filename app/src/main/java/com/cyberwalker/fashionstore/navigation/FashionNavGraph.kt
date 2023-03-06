@@ -23,20 +23,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.cyberwalker.fashionstore.data.Profile.Profile
 import com.cyberwalker.fashionstore.detail.DetailScreen
 import com.cyberwalker.fashionstore.detail.DetailScreenActions
 import com.cyberwalker.fashionstore.dump.animatedComposable
 import com.cyberwalker.fashionstore.home.HomeScreen
 import com.cyberwalker.fashionstore.home.HomeScreenActions
+import com.cyberwalker.fashionstore.login.LoginScreen
 import com.cyberwalker.fashionstore.splash.SplashScreen
 import com.cyberwalker.fashionstore.splash.SplashScreenActions
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.firebase.auth.FirebaseAuth
 
 sealed class Screen(val name: String, val route: String) {
     object Splash : Screen("splash", "splash")
     object Home : Screen("home", "home")
     object Detail : Screen("detail", "detail")
+    object Login : Screen("login", "login")
+    object Profile : Screen("Profile", "Profile")
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -54,15 +59,27 @@ fun FashionNavGraph(
         modifier = modifier
     ) {
         animatedComposable(Screen.Splash.route) {
-            SplashScreen(onAction = actions::navigateToHome)
+            if(FirebaseAuth.getInstance().currentUser!=null){
+                SplashScreen(onAction = actions::navigateToHome)
+            }else{
+                SplashScreen(onAction = actions::navigateToLogin)
+            }
+
         }
 
         animatedComposable(Screen.Home.route) {
-            HomeScreen(onAction = actions::navigateFromHome,navController = navController)
+            HomeScreen(onAction = actions::navigateFromHome, navController = navController)
         }
 
         animatedComposable(Screen.Detail.route) {
             DetailScreen(onAction = actions::navigateFromDetails)
+        }
+
+        animatedComposable(Screen.Login.route) {
+            LoginScreen(onAction = actions::navigateToHome)
+        }
+        animatedComposable(Screen.Profile.route) {
+            Profile(navController = navController)
         }
     }
 }
@@ -70,7 +87,7 @@ fun FashionNavGraph(
 class NavActions(private val navController: NavController) {
     fun navigateToHome(_A: SplashScreenActions) {
         navController.navigate(Screen.Home.name) {
-            popUpTo(Screen.Splash.route){
+            popUpTo(Screen.Splash.route) {
                 inclusive = true
             }
         }
@@ -85,8 +102,16 @@ class NavActions(private val navController: NavController) {
     }
 
     fun navigateFromDetails(actions: DetailScreenActions) {
-        when(actions) {
+        when (actions) {
             DetailScreenActions.Back -> navController.popBackStack()
+        }
+    }
+
+    fun navigateToLogin(actions: SplashScreenActions) {
+        navController.navigate(Screen.Login.name) {
+            popUpTo(Screen.Splash.route) {
+                inclusive = true
+            }
         }
     }
 }
