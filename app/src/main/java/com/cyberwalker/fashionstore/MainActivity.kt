@@ -22,7 +22,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +30,9 @@ import com.cyberwalker.fashionstore.ui.theme.FashionStoreTheme
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 
+
 private const val TAG = "MainActivity"
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,24 @@ class MainActivity : ComponentActivity() {
                 //Use firebaseMessagingToken further
             }
         }
+
+        val intent = this.intent
+
+        val extras = intent.extras
+        if (extras != null) {
+            val body = intent.getStringExtra("body")
+            Log.d(TAG, "onCreate: body= $body")
+        } else {
+            Log.w("myTag", "extras is null")
+        }
+//        val ss:String = intent.getStringExtra("body").toString()
+//        val intent_o = intent
+//        Log.d(TAG, "onCreate: $intent_o")
+//        Log.d(TAG, "onCreate: body= $ss")
+//        if (intent_o != null) {
+//            val body = intent_o.getStringExtra("body")
+//            Log.d(TAG, "onCreate: body= $body")
+//        }
         setContent {
             FashionStoreTheme {
                 // A surface container using the 'background' color from the theme

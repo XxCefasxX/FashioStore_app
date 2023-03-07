@@ -84,8 +84,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.42"
 
 
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.2.0'
 
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-auth:21.1.0'

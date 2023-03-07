@@ -27,8 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TestActivity"
+            android:exported="true"/>
         <service
-            android:name=".data.FirebaseMessagingService"
+            android:name=".data.MyFirebaseMessagingService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false">
