@@ -9,9 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.SnackbarDefaults.backgroundColor
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -21,7 +20,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cyberwalker.fashionstore.R
 import com.cyberwalker.fashionstore.home.HomeScreenActions
 import com.cyberwalker.fashionstore.splash.SplashScreenActions
+import com.cyberwalker.fashionstore.ui.theme.cardColorGreen
+import com.cyberwalker.fashionstore.ui.theme.facebookBackGround
+import com.cyberwalker.fashionstore.ui.theme.highlight
+import com.cyberwalker.fashionstore.ui.theme.ltgray
 
 @Composable
 fun LoginScreen(onAction: (actions: SplashScreenActions) -> Unit) {
@@ -42,8 +47,15 @@ fun LoginScreen(onAction: (actions: SplashScreenActions) -> Unit) {
             contentDescription = null
         )
         Spacer(modifier = Modifier.height(30.dp))
+
         Login(onAction = onAction)
+        Spacer(modifier = Modifier.height(20.dp))
         GoogleLogin(onAction = onAction)
+        Spacer(modifier = Modifier.height(20.dp))
+        FaceBookLogin(onAction = onAction)
+        Spacer(modifier = Modifier.height(20.dp))
+        GitHubLogin(onAction = onAction)
+
     }
 
 }
@@ -53,107 +65,278 @@ fun Login(
     viewModel: LoginViewModel = hiltViewModel(),
     onAction: (actions: SplashScreenActions) -> Unit
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val email = remember { mutableStateOf(TextFieldValue()) }
-        val password = remember { mutableStateOf(TextFieldValue()) }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            Modifier.weight(8f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val email = remember { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
+            var passwordVisibility by remember { mutableStateOf(false) }
 
-        TextField(
-            modifier = Modifier
-                .background(Color.White),
-            value = email.value,
-            singleLine = false,
-            onValueChange = {
-                email.value = it
-            },
-            placeholder = {
-                Text(text = "email", color = Color.LightGray)
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = email.value,
+                singleLine = false,
+                onValueChange = {
+                    email.value = it
+                },
+                placeholder = { Text(text = "Email", color = highlight) },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = highlight,
+                    unfocusedBorderColor = cardColorGreen
+                )
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+
+            val icon = if (passwordVisibility)
+                painterResource(id = R.drawable.no_eye)
+            else
+                painterResource(id = R.drawable.eye)
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = password,
+                onValueChange = {
+                    password = it
+                },
+                label = { Text(text = "Password", color = highlight) },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = highlight,
+                    unfocusedBorderColor = cardColorGreen
+                ),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        passwordVisibility = !passwordVisibility
+                    }) {
+                        Icon(
+                            painter = icon,
+                            contentDescription = "Visibility Icon"
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password
+                ),
+                visualTransformation = if (passwordVisibility) VisualTransformation.None
+                else PasswordVisualTransformation()
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    modifier = Modifier.weight(5f),
+                    onClick = {
+                        viewModel.loginWithEmail(email.value, password, onAction)
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)
+                )
+                {
+                    Text(text = "Login", color = Color.White)
+                }
+                Spacer(modifier = Modifier.weight(1f))
             }
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        TextField(
-            modifier = Modifier
-                .background(Color.White),
-            value = password.value,
-            singleLine = false,
-            onValueChange = {
-                password.value = it
-            },
-            placeholder = {
-                Text(text = "password", color = Color.LightGray)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(
-            onClick = {
-                viewModel.loginWithEmail(email.value.text, password.value.text, onAction)
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)
-        )
-        {
-            Text(text = "Login", color = Color.White)
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
 
 @Composable
-fun GoogleLogin( viewModel: LoginViewModel = hiltViewModel(),
-                 onAction: (actions: SplashScreenActions) -> Unit) {
-    Button(
-        onClick = {
+fun GoogleLogin(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onAction: (actions: SplashScreenActions) -> Unit
+) {
+    Row(Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            onClick = {
 //            viewModel.loginWithGoogle()
-                  },
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(0.dp),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 0.dp,
-            pressedElevation = 0.dp,
-            hoveredElevation = 0.dp,
-            focusedElevation = 0.dp
-        ),
-        shape = RoundedCornerShape(28.dp),
-        contentPadding = PaddingValues(15.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = backgroundColor,
-            contentColor = Color.Red
-        ),
-        border = BorderStroke(1.dp, Color.White)
-    ) {
-        Box(
+            },
             modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+                .weight(8f)
+                .shadow(0.dp),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            shape = RoundedCornerShape(28.dp),
+            contentPadding = PaddingValues(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Red
+            ),
+            border = BorderStroke(1.dp, backgroundColor)
         ) {
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.google),
+                Row(
                     modifier = Modifier
-                        .size(38.dp),
-                    contentDescription = "drawable_icons",
-                    tint = Color.Unspecified
-                )
-            }
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = "Google",
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart)
+                ) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.google),
+                        modifier = Modifier
+                            .size(38.dp),
+                        contentDescription = "drawable_icons",
+                        tint = Color.Unspecified
+                    )
+                }
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "Google",
+                    color = backgroundColor,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
 //                fontFamily = FontFamily(
 //                    Font(
 //                        R.font.roboto_medium
 //                    )
 //                )
-            )
+                )
+            }
         }
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun FaceBookLogin(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onAction: (actions: SplashScreenActions) -> Unit
+) {
+    Row(Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            onClick = {
+//            viewModel.loginWithGoogle()
+            },
+            modifier = Modifier
+                .weight(8f)
+                .shadow(0.dp),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            shape = RoundedCornerShape(28.dp),
+            contentPadding = PaddingValues(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Red
+            ),
+            border = BorderStroke(1.dp, backgroundColor)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart)
+                ) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.facebook),
+                        modifier = Modifier
+                            .size(38.dp),
+                        contentDescription = "drawable_icons",
+                        tint = Color.Unspecified
+                    )
+                }
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "Facebook",
+                    color = backgroundColor,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+//                fontFamily = FontFamily(
+//                    Font(
+//                        R.font.roboto_medium
+//                    )
+//                )
+                )
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun GitHubLogin(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onAction: (actions: SplashScreenActions) -> Unit
+) {
+    Row(Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            onClick = {
+//            viewModel.loginWithGoogle()
+            },
+            modifier = Modifier
+                .weight(8f)
+                .shadow(0.dp),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                focusedElevation = 0.dp
+            ),
+            shape = RoundedCornerShape(28.dp),
+            contentPadding = PaddingValues(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Red
+            ),
+            border = BorderStroke(1.dp, backgroundColor)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart)
+                ) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.github),
+                        modifier = Modifier
+                            .size(38.dp),
+                        contentDescription = "drawable_icons",
+                        tint = Color.Unspecified
+                    )
+                }
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "Github",
+                    color = backgroundColor,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+//                fontFamily = FontFamily(
+//                    Font(
+//                        R.font.roboto_medium
+//                    )
+//                )
+                )
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

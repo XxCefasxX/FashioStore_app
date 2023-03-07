@@ -35,6 +35,7 @@ val cardColorBlue = Color(0xFFB5DEFF)
 val cardColorPeach = Color(0xFFFFADAD)
 val cardColorGreen = Color(0xFFC2F784)
 val sizeGreen = Color(0xFFE3F5E0)
+val facebookBackGround = Color(0x3889560)
 
 
 val Colors.bottomNavbg: Color get() = if (isLight) Color(0xFFFAFAFA) else dark
