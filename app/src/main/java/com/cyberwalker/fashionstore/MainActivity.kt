@@ -16,6 +16,7 @@
 package com.cyberwalker.fashionstore
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +28,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.cyberwalker.fashionstore.navigation.FashionNavGraph
 import com.cyberwalker.fashionstore.ui.theme.FashionStoreTheme
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "MainActivity"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(this) {
+            if (!it.isSuccessful) {
+                //Could not get FirebaseMessagingToken
+                Log.d(TAG, "No Token")
+            }
+            if (null != it.result) {
+                //Got FirebaseMessagingToken
+                val firebaseMessagingToken: String = it.result
+                Log.d(TAG, "Token: $firebaseMessagingToken")
+                //Use firebaseMessagingToken further
+            }
+        }
         setContent {
             FashionStoreTheme {
                 // A surface container using the 'background' color from the theme
