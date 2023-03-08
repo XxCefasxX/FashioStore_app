@@ -138,7 +138,7 @@ fun EmptyFavorites() {
     Column(
         modifier = Modifier
             .padding(30.dp)
-            .fillMaxWidth().
+            .fillMaxWidth()
             .wrapContentSize(Alignment.Center),
     ) {
         Text(
