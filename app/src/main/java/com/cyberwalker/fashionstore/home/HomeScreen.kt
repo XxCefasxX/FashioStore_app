@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +34,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.cyberwalker.fashionstore.Favorites.FavoritesViewModel
 import com.cyberwalker.fashionstore.R
+import com.cyberwalker.fashionstore.data.model.Clothes
 import com.cyberwalker.fashionstore.dump.BottomNav
 import com.cyberwalker.fashionstore.dump.vertical
 import com.cyberwalker.fashionstore.ui.theme.*
@@ -208,7 +212,12 @@ private fun TabRow() {
 }
 
 @Composable
-private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
+private fun GridOfImages(
+    onAction: (actions: HomeScreenActions) -> Unit,
+    favoritesVM: FavoritesViewModel = hiltViewModel()
+) {
+    val _favorites by favoritesVM.Favorites.observeAsState()
+    favoritesVM.getFavorites()
     Row(modifier = Modifier.fillMaxWidth()) {
         Column {
             Box(
@@ -226,11 +235,18 @@ private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
                     contentDescription = null
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.ic_heart),
+                    painter = painterResource(id = isFavorite("Jhc T-Shirt", _favorites)),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp).clickable {  }
+                        .padding(end = 8.dp, top = 8.dp)
+                        .clickable {
+                            favoritesVM.addRemoveFavorite(
+                                "Jhc T-Shirt",
+                                989f,
+                                R.drawable.img_1
+                            )
+                        }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
@@ -255,11 +271,18 @@ private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
                     contentDescription = null
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.ic_heart),
+                    painter = painterResource(id = isFavorite("Lkm T-Shirt", _favorites)),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp).clickable {  }
+                        .padding(end = 8.dp, top = 8.dp)
+                        .clickable {
+                            favoritesVM.addRemoveFavorite(
+                                "Lkm T-Shirt",
+                                674f,
+                                R.drawable.img_3
+                            )
+                        }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
@@ -285,12 +308,21 @@ private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
                     painter = painterResource(id = R.drawable.img_2),
                     contentDescription = null
                 )
+
                 Image(
-                    painter = painterResource(id = R.drawable.ic_heart),
+                    painter = painterResource(id = isFavorite("Sbm T-Shirt", _favorites)),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp).clickable {  }
+                        .padding(end = 8.dp, top = 8.dp)
+                        .clickable {
+                            favoritesVM.addRemoveFavorite(
+                                "Sbm T-Shirt",
+                                1189f,
+                                R.drawable.img_2
+                            )
+//                            Log.d(TAG, "GridOfImages: $_favorites")
+                        }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
@@ -314,12 +346,20 @@ private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
                     painter = painterResource(id = R.drawable.img_4),
                     contentDescription = null
                 )
+                isFavorite("Nkr T-Shirt", _favorites)
                 Image(
-                    painter = painterResource(id = R.drawable.ic_heart),
+                    painter = painterResource(id = isFavorite("Nkr T-Shirt", _favorites)),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp).clickable {  }
+                        .padding(end = 8.dp, top = 8.dp)
+                        .clickable {
+                            favoritesVM.addRemoveFavorite(
+                                "Nkr T-Shirt",
+                                1589f,
+                                R.drawable.img_4
+                            )
+                        }
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
@@ -332,6 +372,16 @@ private fun GridOfImages(onAction: (actions: HomeScreenActions) -> Unit,) {
     }
 }
 
+fun isFavorite(name: String, _favorites: List<Clothes>?): Int {
+    var heartImg = R.drawable.ic_heart
+    _favorites?.let {
+        for (favorite in _favorites) {
+            if (favorite.name == name)
+                heartImg = R.drawable.ic_heart_filled
+        }
+    }
+    return heartImg
+}
 
 sealed class HomeScreenActions {
     object Details : HomeScreenActions()

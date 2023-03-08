@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.cyberwalker.fashionstore.data.Favorites.FavoritesScreen
+import com.cyberwalker.fashionstore.Favorites.FavoritesScreen
 import com.cyberwalker.fashionstore.Profile.Profile
 import com.cyberwalker.fashionstore.Search.SearchScreen
 import com.cyberwalker.fashionstore.detail.DetailScreen

@@ -32,7 +32,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //
 ////        val click_action: String = message.notification?.clickAction!!
 //        Log.d(TAG, "onMessageReceived: in")
-//        sendNotification(message.notification?.body, message.notification?.title)
+        sendNotification(message.notification?.body, message.notification?.title)
 //        super.onMessageReceived(message)
 
 
@@ -69,7 +69,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(message.notification!!.body)
             .setDefaults(Notification.DEFAULT_ALL)
             .setWhen(System.currentTimeMillis())
-            .setSmallIcon(R.drawable.editbox_background)
+            .setSmallIcon(R.drawable.ic_delete)
             .setAutoCancel(true)
 
 
@@ -81,13 +81,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendNotification(body: String?, title: String?) {
         Log.d(TAG, "sendNotification: enter")
 //        val intent = Intent(click_action)
-        val intent = Intent(applicationContext, TestActivity::class.java)
+        val intent = Intent(this, TestActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         intent.putExtra("body", "is the body");
 
         val pendingIntent = PendingIntent.getActivity(
-            applicationContext, 0, intent,
+            this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
