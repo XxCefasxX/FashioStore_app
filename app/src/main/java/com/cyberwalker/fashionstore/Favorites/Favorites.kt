@@ -17,19 +17,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cyberwalker.fashionstore.R
 import com.cyberwalker.fashionstore.data.model.Clothes
 import com.cyberwalker.fashionstore.dump.BottomNav
-import com.cyberwalker.fashionstore.ui.theme.cardColorBlue
-import com.cyberwalker.fashionstore.ui.theme.cardColorGreen
-import com.cyberwalker.fashionstore.ui.theme.cardColorYellow
-import com.cyberwalker.fashionstore.ui.theme.small_caption2
+import com.cyberwalker.fashionstore.ui.theme.*
 import java.util.*
 
-val bgColors = listOf<Color>(cardColorYellow, cardColorBlue, cardColorGreen, cardColorGreen)
+val bgColors = listOf<Color>(
+    cardColorYellow,
+    cardColorBlue,
+    cardColorGreen,
+    cardColorGreen2,
+    cardColorPurple,
+    cardColorPink,
+    cardColorOrange
+)
 
 @Composable
 fun FavoritesScreen(
@@ -47,17 +55,27 @@ fun FavoritesScreen(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
-            _favorites?.let {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(_favorites!!.size) { fav ->
-                        FavoriteItem(favorite = _favorites!![fav])
-                    }
+            if (_favorites != null) {
+                Log.d(TAG, "FavoritesScreen: cccc")
+                _favorites?.let {
+                    if (it.isNotEmpty()) {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            items(_favorites!!.size) { fav ->
+                                FavoriteItem(favorite = _favorites!![fav])
+                            }
 
+                        }
+
+                    } else {
+                        EmptyFavorites()
+                    }
                 }
+            } else {
+                EmptyFavorites()
             }
 
-        }
 
+        }
 
         //LAST ROW
         Row(
@@ -70,7 +88,7 @@ fun FavoritesScreen(
 }
 
 @Composable
-fun FavoriteItem(favorite: Clothes,favoritesVM: FavoritesViewModel = hiltViewModel()) {
+fun FavoriteItem(favorite: Clothes, favoritesVM: FavoritesViewModel = hiltViewModel()) {
     val favoriteBG = bgColors.random()
     Box(
         modifier = Modifier
@@ -87,7 +105,10 @@ fun FavoriteItem(favorite: Clothes,favoritesVM: FavoritesViewModel = hiltViewMod
                 contentDescription = null
             )
             Column(Modifier.weight(3f)) {
-                Text(text = favorite.name, style = MaterialTheme.typography.small_caption2)
+                Text(
+                    text = favorite.name, style = MaterialTheme.typography.small_caption2,
+                    fontSize = 20.sp
+                )
                 Text(
                     text = "₹${favorite.price.toString()}",
                     style = MaterialTheme.typography.small_caption2
@@ -110,4 +131,28 @@ fun FavoriteItem(favorite: Clothes,favoritesVM: FavoritesViewModel = hiltViewMod
             )
         }
     }
+}
+
+@Composable
+fun EmptyFavorites() {
+    Column(
+        modifier = Modifier
+            .padding(30.dp)
+            .fillMaxWidth().
+            .wrapContentSize(Alignment.Center),
+    ) {
+        Text(
+            text = "Continue exploring and add some article :)", color = Color.Gray,
+            modifier = Modifier.padding(16.dp),
+            textAlign = TextAlign.Center,
+        )
+    }
+
+}
+
+
+@Preview
+@Composable
+fun EmptyFavoritesPrev() {
+    EmptyFavorites()
 }

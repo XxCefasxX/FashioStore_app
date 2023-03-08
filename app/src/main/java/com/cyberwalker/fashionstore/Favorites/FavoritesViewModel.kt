@@ -19,8 +19,6 @@ class FavoritesViewModel : ViewModel() {
     private val _Favorites = MutableLiveData<List<Clothes>>()
     val Favorites: LiveData<List<Clothes>> = _Favorites
 
-    private val _f = MutableLiveData<Clothes>()
-    val f: LiveData<Clothes> = _f
 
 
     fun addRemoveFavorite(name: String, price: Float, img: Int) {

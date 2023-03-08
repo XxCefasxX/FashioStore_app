@@ -18,19 +18,48 @@ package com.cyberwalker.fashionstore.home
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.cyberwalker.fashionstore.data.model.Clothes
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+val userDBRegister = FirebaseFirestore.getInstance()
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     var uiState by mutableStateOf(HomeUiState())
         private set
+
+    private val _Clothes = MutableLiveData<List<Clothes>>()
+    val Clothes: LiveData<List<Clothes>> = _Clothes
+
+    fun getClothes() {
+        var clothes = ArrayList<Clothes>()
+        userDBRegister.collection("Store")
+            .document("Articles")
+            .collection("Cloths").get().addOnSuccessListener { sttoreClothes ->
+                for (item in sttoreClothes) {
+                    val name = item["name"].toString() ?: ""
+                    val price = item["price"].toString().toFloat() ?: 0f
+                    val img = item["img"].toString().toInt() ?: 2131099688
+                    if (name != "" && img > 0) {
+                        clothes.add(
+                            Clothes(
+                                name,
+                                price,
+                                img
+                            )
+                        )
+                    }
+
+                }
+                _Clothes.postValue(clothes)
+            }
+    }
 
 }
 

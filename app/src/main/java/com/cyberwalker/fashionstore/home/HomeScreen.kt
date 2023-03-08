@@ -15,6 +15,7 @@
  */
 package com.cyberwalker.fashionstore.home
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +41,8 @@ import com.cyberwalker.fashionstore.data.model.Clothes
 import com.cyberwalker.fashionstore.dump.BottomNav
 import com.cyberwalker.fashionstore.dump.vertical
 import com.cyberwalker.fashionstore.ui.theme.*
+
+private const val TAG = "HomeScreen"
 
 @Composable
 fun HomeScreen(
@@ -211,13 +214,60 @@ private fun TabRow() {
     }
 }
 
+
 @Composable
-private fun GridOfImages(
+fun GridOfImageItem(
+    name: String,
+    price: Float,
+    img: Int,
+    favorite: Int,
     onAction: (actions: HomeScreenActions) -> Unit,
     favoritesVM: FavoritesViewModel = hiltViewModel()
 ) {
+    val bgColors = listOf<Color>(cardColorYellow, cardColorBlue, cardColorGreen, cardColorGreen)
+    val cardBG = bgColors.random()
+    Box(
+        Modifier
+            .size(120.dp, 150.dp)
+            .background(color = cardBG, shape = RoundedCornerShape(16.dp))
+            .clip(shape = RoundedCornerShape(16.dp))
+            .clickable { onAction(HomeScreenActions.Details) }
+    ) {
+        Image(
+            modifier = Modifier
+                .size(92.dp, 144.dp)
+                .align(Alignment.BottomCenter),
+            painter = painterResource(id = R.drawable.img_1),
+            contentDescription = null
+        )
+        Image(
+            painter = painterResource(id = favorite),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 8.dp, top = 8.dp)
+                .clickable {
+                    favoritesVM.addRemoveFavorite(
+                        name,
+                        price,
+                        img
+                    )
+                }
+        )
+    }
+}
+
+@Composable
+private fun GridOfImages(
+    onAction: (actions: HomeScreenActions) -> Unit,
+    favoritesVM: FavoritesViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
+    val _storeClothes by homeViewModel.Clothes.observeAsState()
     val _favorites by favoritesVM.Favorites.observeAsState()
     favoritesVM.getFavorites()
+    homeViewModel.getClothes()
+    Log.d(TAG, "GridOfImages: clothes $_storeClothes")
     Row(modifier = Modifier.fillMaxWidth()) {
         Column {
             Box(
