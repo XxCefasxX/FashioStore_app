@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.cyberwalker.fashionstore.Favorites.FavoritesViewModel
 import com.cyberwalker.fashionstore.R
 import com.cyberwalker.fashionstore.data.model.Clothes
@@ -216,10 +217,10 @@ private fun TabRow() {
 
 
 @Composable
-fun GridOfImageItem(
+fun GridOfImageItemLeft(
     name: String,
     price: Float,
-    img: Int,
+    img: String,
     favorite: Int,
     onAction: (actions: HomeScreenActions) -> Unit,
     favoritesVM: FavoritesViewModel = hiltViewModel()
@@ -237,7 +238,8 @@ fun GridOfImageItem(
             modifier = Modifier
                 .size(92.dp, 144.dp)
                 .align(Alignment.BottomCenter),
-            painter = painterResource(id = R.drawable.img_1),
+            painter = rememberAsyncImagePainter(img),
+//            painter = rememberAsyncImagePainter("https://www.pngfind.com/pngs/m/52-524008_women-fashion-model-png-transparent-png.png"),
             contentDescription = null
         )
         Image(
@@ -255,6 +257,60 @@ fun GridOfImageItem(
                 }
         )
     }
+    Spacer(modifier = Modifier.size(8.dp))
+    Row {
+        Text(text = name, style = MaterialTheme.typography.small_caption2)
+        Spacer(modifier = Modifier.size(24.dp))
+        Text(text = "₹$price", style = MaterialTheme.typography.small_caption2)
+    }
+}
+
+@Composable
+fun GridOfImagesItemRight(
+    name: String,
+    price: Float,
+    img: String,
+    favorite: Int,
+    onAction: (actions: HomeScreenActions) -> Unit,
+    favoritesVM: FavoritesViewModel = hiltViewModel()
+) {
+    Box(
+        Modifier
+            .size(120.dp, 180.dp)
+            .background(color = cardColorBlue, shape = RoundedCornerShape(16.dp))
+            .clip(shape = RoundedCornerShape(16.dp))
+            .clickable { onAction(HomeScreenActions.Details) }
+    ) {
+        Image(
+            modifier = Modifier
+                .size(112.dp, 170.dp)
+                .align(Alignment.BottomCenter),
+            painter = rememberAsyncImagePainter(img),
+            contentDescription = null
+        )
+
+        Image(
+            painter = painterResource(id = favorite),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 8.dp, top = 8.dp)
+                .clickable {
+                    favoritesVM.addRemoveFavorite(
+                        name,
+                        price,
+                        img
+                    )
+//                            Log.d(TAG, "GridOfImages: $_favorites")
+                }
+        )
+    }
+    Spacer(modifier = Modifier.size(8.dp))
+    Row {
+        Text(text = name, style = MaterialTheme.typography.small_caption2)
+        Spacer(modifier = Modifier.size(16.dp))
+        Text(text = "₹$price", style = MaterialTheme.typography.small_caption2)
+    }
 }
 
 @Composable
@@ -267,156 +323,52 @@ private fun GridOfImages(
     val _favorites by favoritesVM.Favorites.observeAsState()
     favoritesVM.getFavorites()
     homeViewModel.getClothes()
+
+
+
     Log.d(TAG, "GridOfImages: clothes $_storeClothes")
     Row(modifier = Modifier.fillMaxWidth()) {
-        Column {
-            Box(
-                Modifier
-                    .size(120.dp, 150.dp)
-                    .background(color = cardColorYellow, shape = RoundedCornerShape(16.dp))
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .clickable { onAction(HomeScreenActions.Details) }
-            ) {
-                Image(
-                    modifier = Modifier
-                        .size(92.dp, 144.dp)
-                        .align(Alignment.BottomCenter),
-                    painter = painterResource(id = R.drawable.img_1),
-                    contentDescription = null
-                )
-                Image(
-                    painter = painterResource(id = isFavorite("Jhc T-Shirt", _favorites)),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp)
-                        .clickable {
-                            favoritesVM.addRemoveFavorite(
-                                "Jhc T-Shirt",
-                                989f,
-                                R.drawable.img_1
-                            )
-                        }
-                )
-            }
-            Spacer(modifier = Modifier.size(8.dp))
-            Row {
-                Text(text = "Jhc T-Shirt", style = MaterialTheme.typography.small_caption2)
-                Spacer(modifier = Modifier.size(24.dp))
-                Text(text = "₹989", style = MaterialTheme.typography.small_caption2)
-            }
-            Spacer(modifier = Modifier.size(24.dp))
-            Box(
-                Modifier
-                    .size(120.dp, 180.dp)
-                    .background(color = cardColorPeach, shape = RoundedCornerShape(16.dp))
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .clickable { onAction(HomeScreenActions.Details) }
-            ) {
-                Image(
-                    modifier = Modifier
-                        .size(112.dp, 170.dp)
-                        .align(Alignment.BottomCenter),
-                    painter = painterResource(id = R.drawable.img_3),
-                    contentDescription = null
-                )
-                Image(
-                    painter = painterResource(id = isFavorite("Lkm T-Shirt", _favorites)),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp)
-                        .clickable {
-                            favoritesVM.addRemoveFavorite(
-                                "Lkm T-Shirt",
-                                674f,
-                                R.drawable.img_3
-                            )
-                        }
-                )
-            }
-            Spacer(modifier = Modifier.size(8.dp))
-            Row {
-                Text(text = "Lkm T-Shirt", style = MaterialTheme.typography.small_caption2)
-                Spacer(modifier = Modifier.size(24.dp))
-                Text(text = "₹674", style = MaterialTheme.typography.small_caption2)
-            }
-        }
-        Spacer(modifier = Modifier.size(24.dp))
-        Column {
-            Box(
-                Modifier
-                    .size(120.dp, 180.dp)
-                    .background(color = cardColorBlue, shape = RoundedCornerShape(16.dp))
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .clickable { onAction(HomeScreenActions.Details) }
-            ) {
-                Image(
-                    modifier = Modifier
-                        .size(112.dp, 170.dp)
-                        .align(Alignment.BottomCenter),
-                    painter = painterResource(id = R.drawable.img_2),
-                    contentDescription = null
-                )
+        _storeClothes?.let {
+            val storeSize = _storeClothes?.size ?: 0
 
-                Image(
-                    painter = painterResource(id = isFavorite("Sbm T-Shirt", _favorites)),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp)
-                        .clickable {
-                            favoritesVM.addRemoveFavorite(
-                                "Sbm T-Shirt",
-                                1189f,
-                                R.drawable.img_2
-                            )
-//                            Log.d(TAG, "GridOfImages: $_favorites")
-                        }
-                )
+            var middleIndex = storeSize / 2
+            if (storeSize % 2 > 0) {
+                middleIndex += 1
             }
-            Spacer(modifier = Modifier.size(8.dp))
-            Row {
-                Text(text = "Sbm T-Shirt", style = MaterialTheme.typography.small_caption2)
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(text = "₹1189", style = MaterialTheme.typography.small_caption2)
+
+            Log.d(TAG, "GridOfImages: mid $middleIndex")
+            val firstHalf = _storeClothes?.subList(0, middleIndex)
+            val secondHalf = _storeClothes?.subList(middleIndex, storeSize)
+            Log.d(TAG, "GridOfImages: first = $firstHalf")
+            Log.d(TAG, "GridOfImages: second = $secondHalf")
+            Column {
+
+                for (article in 0 until firstHalf!!.size) {
+                    GridOfImageItemLeft(
+                        name = firstHalf[article].name,
+                        price = firstHalf[article].price,
+                        img = firstHalf[article].picture,
+                        favorite = isFavorite(firstHalf[article].name, _favorites),
+                        onAction = onAction
+                    )
+                    Spacer(modifier = Modifier.size(24.dp))
+                }
+
+
             }
             Spacer(modifier = Modifier.size(24.dp))
-            Box(
-                Modifier
-                    .size(120.dp, 180.dp)
-                    .background(color = cardColorGreen, shape = RoundedCornerShape(16.dp))
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .clickable { onAction(HomeScreenActions.Details) }
-            ) {
-                Image(
-                    modifier = Modifier
-                        .size(112.dp, 170.dp)
-                        .align(Alignment.BottomCenter),
-                    painter = painterResource(id = R.drawable.img_4),
-                    contentDescription = null
-                )
-                isFavorite("Nkr T-Shirt", _favorites)
-                Image(
-                    painter = painterResource(id = isFavorite("Nkr T-Shirt", _favorites)),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 8.dp, top = 8.dp)
-                        .clickable {
-                            favoritesVM.addRemoveFavorite(
-                                "Nkr T-Shirt",
-                                1589f,
-                                R.drawable.img_4
-                            )
-                        }
-                )
-            }
-            Spacer(modifier = Modifier.size(8.dp))
-            Row {
-                Text(text = "Nkr T-Shirt", style = MaterialTheme.typography.small_caption2)
-                Spacer(modifier = Modifier.size(24.dp))
-                Text(text = "₹1589", style = MaterialTheme.typography.small_caption2)
+            Column {
+                for (article in 0 until secondHalf!!.size) {
+                    GridOfImagesItemRight(
+                        name = secondHalf[article].name,
+                        price = secondHalf[article].price,
+                        img = secondHalf[article].picture,
+                        favorite = isFavorite(secondHalf[article].name, _favorites),
+                        onAction = onAction
+                    )
+                    Spacer(modifier = Modifier.size(24.dp))
+                }
+
             }
         }
     }

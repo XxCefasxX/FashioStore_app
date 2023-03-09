@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.cyberwalker.fashionstore.R
 import com.cyberwalker.fashionstore.data.model.Clothes
 import com.cyberwalker.fashionstore.dump.BottomNav
@@ -101,7 +102,7 @@ fun FavoriteItem(favorite: Clothes, favoritesVM: FavoritesViewModel = hiltViewMo
                 modifier = Modifier
                     .size(92.dp, 144.dp)
                     .weight(2f),
-                painter = painterResource(id = favorite.picture),
+                painter = rememberAsyncImagePainter(favorite.picture),
                 contentDescription = null
             )
             Column(Modifier.weight(3f)) {

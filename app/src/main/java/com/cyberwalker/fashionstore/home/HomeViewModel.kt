@@ -45,8 +45,8 @@ class HomeViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 for (item in sttoreClothes) {
                     val name = item["name"].toString() ?: ""
                     val price = item["price"].toString().toFloat() ?: 0f
-                    val img = item["img"].toString().toInt() ?: 2131099688
-                    if (name != "" && img > 0) {
+                    val img = item["img"].toString() ?: ""
+                    if (name != "") {
                         clothes.add(
                             Clothes(
                                 name,

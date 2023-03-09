@@ -21,7 +21,7 @@ class FavoritesViewModel : ViewModel() {
 
 
 
-    fun addRemoveFavorite(name: String, price: Float, img: Int) {
+    fun addRemoveFavorite(name: String, price: Float, img: String) {
         val favorite = Clothes(name, price, img)
         var favs = Favorites.value
         Log.d(TAG, "addRemoveFavorite: favs= $favs")
@@ -105,7 +105,7 @@ class FavoritesViewModel : ViewModel() {
                             Clothes(
                                 fav["name"].toString(),
                                 fav["price"].toString().toFloat(),
-                                fav["img"].toString().toInt()
+                                fav["img"].toString()
                             )
                         )
                     }
