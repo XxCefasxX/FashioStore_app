@@ -16,14 +16,17 @@
 package com.cyberwalker.fashionstore.detail
 
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,36 +44,67 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.cyberwalker.fashionstore.Favorites.FavoritesViewModel
 import com.cyberwalker.fashionstore.R
+import com.cyberwalker.fashionstore.data.model.Clothes
 import com.cyberwalker.fashionstore.dump.vertical
+import com.cyberwalker.fashionstore.navigation.Screen
 import com.cyberwalker.fashionstore.ui.theme.*
 
+private const val TAG = "DetailScreen"
+var itemdesc: String = ""
+
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun DetailScreen(
-    viewModel: DetailViewModel = hiltViewModel(),
+    navController: NavHostController,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     onAction: (actions: DetailScreenActions) -> Unit
 ) {
-    Scaffold(
-        scaffoldState = scaffoldState
-    ) { innerPadding ->
-        DetailScreenContent(modifier = Modifier.padding(innerPadding), onAction = onAction)
+    val backStackEntry = remember {
+        navController.getBackStackEntry(Screen.Home.route)
     }
+    val viewModel: DetailViewModel = hiltViewModel(backStackEntry)
+
+    val itemDetails = remember(viewModel) { viewModel.Clothe }
+    val details by itemDetails.observeAsState()
+
+    Log.d(TAG, "DetailScreen: details=${details}")
+
+    details?.let {
+        Scaffold(
+            scaffoldState = scaffoldState
+        ) { innerPadding ->
+            DetailScreenContent(
+                modifier = Modifier.padding(innerPadding),
+                onAction = onAction,
+                details!!
+            )
+        }
+    }
+
 }
 
 @Composable
 private fun DetailScreenContent(
     modifier: Modifier,
-    onAction: (actions: DetailScreenActions) -> Unit
+    onAction: (actions: DetailScreenActions) -> Unit,
+    itemDetails: Clothes
 ) {
+    itemdesc = itemDetails.description
+    val sizes = itemDetails.sizes
+    Log.d(TAG, "DetailScreenContent: sizes= $sizes")
     Column(
         modifier = modifier
             .padding(horizontal = 40.dp)
             .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
             .semantics { contentDescription = "Detail Screen" }
     ) {
         Spacer(modifier = Modifier.size(16.dp))
-        ImageBox(onAction = onAction)
+        ImageBox(onAction = onAction, clothe = itemDetails)
         Spacer(modifier = Modifier.size(24.dp))
         Row(
             modifier = Modifier
@@ -79,7 +113,7 @@ private fun DetailScreenContent(
         ) {
             TabRow()
             Spacer(modifier = Modifier.size(16.dp))
-            ProductInfo()
+            ProductInfo(itemDetails)
         }
         Spacer(modifier = Modifier.size(16.dp))
         Text(text = "Size", style = MaterialTheme.typography.medium_18)
@@ -87,46 +121,32 @@ private fun DetailScreenContent(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(45.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(color = sizeGreen, shape = RoundedCornerShape(12.dp))
-                    .clickable { },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "S", style = MaterialTheme.typography.medium_18_bold.copy(dark))
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            for(size in sizes){
+                Box(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(color = sizeGreen, shape = RoundedCornerShape(12.dp))
+                        .clickable { },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = size, style = MaterialTheme.typography.medium_18_bold.copy(dark))
+                }
             }
-            Box(modifier = Modifier
-                .size(45.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(color = sizeGreen, shape = RoundedCornerShape(12.dp))
-                .clickable { }, contentAlignment = Alignment.Center) {
-                Text(text = "M", style = MaterialTheme.typography.medium_18_bold.copy(dark))
-            }
-            Box(modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(color = highlight, shape = RoundedCornerShape(12.dp))
-                .clickable { }, contentAlignment = Alignment.Center) {
-                Text(text = "L", style = MaterialTheme.typography.medium_18_bold.copy(color = Color.White))
-            }
-            Box(modifier = Modifier
-                .size(45.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(color = sizeGreen, shape = RoundedCornerShape(12.dp))
-                .clickable { }, contentAlignment = Alignment.Center) {
-                Text(text = "XL", style = MaterialTheme.typography.medium_18_bold.copy(dark))
-            }
+
+
         }
         Spacer(modifier = Modifier.weight(1F))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-           Column {
-               Text(text = "Price", style = MaterialTheme.typography.caption.copy(gray))
-               Spacer(modifier = Modifier.size(4.dp))
-               Text(text = "₹1284", style = MaterialTheme.typography.medium_18)
-           }
+            Column {
+                Text(text = "Price", style = MaterialTheme.typography.caption.copy(gray))
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(text = "₹${itemDetails.price}", style = MaterialTheme.typography.medium_18)
+            }
             Button(
                 onClick = { },
                 colors = ButtonDefaults.buttonColors(backgroundColor = highlight),
@@ -149,14 +169,14 @@ private fun DetailScreenContent(
 }
 
 @Composable
-fun ProductInfo() {
+fun ProductInfo(itemDetails: Clothes) {
     Column() {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Sbm T-Shirt", style = MaterialTheme.typography.medium_18)
+            Text(text = itemDetails.name, style = MaterialTheme.typography.medium_18)
             Row {
                 Text(text = "5/5", style = MaterialTheme.typography.medium_18)
                 Spacer(modifier = Modifier.size(8.dp))
@@ -166,7 +186,16 @@ fun ProductInfo() {
         Text(text = "Modern Peach", style = MaterialTheme.typography.small_caption2)
         Spacer(modifier = Modifier.size(16.dp))
         Text(
-            text = textWithLink,
+            text = buildAnnotatedString {
+
+                append(itemdesc)
+
+                pushStringAnnotation(tag = " See more", annotation = "https://google.com/")
+                withStyle(style = SpanStyle(color = Purple700)) {
+                    append(" See more")
+                }
+                pop()
+            },
             style = MaterialTheme.typography.small_caption.copy(color = gray)
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -186,15 +215,6 @@ fun ProductInfo() {
     }
 }
 
-val textWithLink = buildAnnotatedString {
-    append("Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur, sit fuga? Cum optio fugit ")
-
-    pushStringAnnotation(tag = "See more", annotation = "https://google.com/")
-    withStyle(style = SpanStyle(color = Purple700)) {
-        append("See more")
-    }
-    pop()
-}
 
 val bullet = "\u2022"
 val productInfo = listOf(
@@ -204,7 +224,13 @@ val productInfo = listOf(
 val paragraphStyle = ParagraphStyle(textIndent = TextIndent())
 
 @Composable
-private fun ImageBox(onAction: (actions: DetailScreenActions) -> Unit) {
+private fun ImageBox(
+    clothe: Clothes,
+    onAction: (actions: DetailScreenActions) -> Unit,
+    favoritesVM: FavoritesViewModel = hiltViewModel()
+) {
+    val _favorites by favoritesVM.Favorites.observeAsState()
+    favoritesVM.getFavorites()
     Box(
         modifier = Modifier
             .defaultMinSize(minHeight = 310.dp)
@@ -222,18 +248,36 @@ private fun ImageBox(onAction: (actions: DetailScreenActions) -> Unit) {
         Image(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(end = 16.dp, top = 16.dp),
-            painter = painterResource(id = R.drawable.ic_heart_filled),
+                .padding(end = 16.dp, top = 16.dp)
+                .clickable {
+                    favoritesVM.addRemoveFavorite(
+                        clothe.name,
+                        clothe.price,
+                        clothe.picture
+                    )
+                },
+            painter = painterResource(id = isFavorite(clothe.name, _favorites)),
             contentDescription = null
         )
         Image(
             modifier = Modifier
                 .defaultMinSize(minWidth = 287.dp, minHeight = 335.dp)
                 .align(Alignment.BottomCenter),
-            painter = painterResource(id = R.drawable.ic_girl),
+            painter = rememberAsyncImagePainter(clothe.picture),
             contentDescription = null
         )
     }
+}
+
+fun isFavorite(name: String, _favorites: List<Clothes>?): Int {
+    var heartImg = R.drawable.ic_heart
+    _favorites?.let {
+        for (favorite in _favorites) {
+            if (favorite.name == name)
+                heartImg = R.drawable.ic_heart_filled
+        }
+    }
+    return heartImg
 }
 
 @Composable

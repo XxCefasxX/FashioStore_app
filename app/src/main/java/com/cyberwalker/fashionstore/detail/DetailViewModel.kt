@@ -15,22 +15,53 @@
  */
 package com.cyberwalker.fashionstore.detail
 
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.cyberwalker.fashionstore.Favorites.FavoritesViewModel
+import com.cyberwalker.fashionstore.R
+import com.cyberwalker.fashionstore.data.model.Clothes
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val TAG = "DetailViewModel"
+
+val storeDB = FirebaseFirestore.getInstance()
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     var uiState by mutableStateOf(DetailUiState())
         private set
+
+    private val _Clothe = MutableLiveData<Clothes>()
+    val Clothe: LiveData<Clothes> = _Clothe
+
+
+    fun getDetails(name: String) {
+        storeDB.collection("Store")
+            .document("Articles")
+            .collection("Cloths")
+            .document(name).get().addOnSuccessListener { item ->
+                val selectedClothe = Clothes(
+                    name = item["name"].toString(),
+                    price = item["price"].toString().toFloat(),
+                    picture = item["img"].toString(),
+                    description = item["description"].toString(),
+                    sizes = item["sizes"] as ArrayList<String>
+                )
+                _Clothe.postValue(selectedClothe)
+                Log.d(TAG, "getDetails: details=${Clothe.value}")
+            }
+    }
+
 }
 
 data class DetailUiState(

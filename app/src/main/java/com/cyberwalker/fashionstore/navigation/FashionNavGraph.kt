@@ -76,7 +76,7 @@ fun FashionNavGraph(
         }
 
         animatedComposable(Screen.Detail.route) {
-            DetailScreen(onAction = actions::navigateFromDetails)
+            DetailScreen(onAction = actions::navigateFromDetails, navController = navController)
         }
 
         animatedComposable(Screen.Login.route) {

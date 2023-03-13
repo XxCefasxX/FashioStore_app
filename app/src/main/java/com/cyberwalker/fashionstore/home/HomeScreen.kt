@@ -24,6 +24,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.cyberwalker.fashionstore.Favorites.FavoritesViewModel
 import com.cyberwalker.fashionstore.R
 import com.cyberwalker.fashionstore.data.model.Clothes
+import com.cyberwalker.fashionstore.detail.DetailViewModel
 import com.cyberwalker.fashionstore.dump.BottomNav
 import com.cyberwalker.fashionstore.dump.vertical
 import com.cyberwalker.fashionstore.ui.theme.*
@@ -223,7 +225,8 @@ fun GridOfImageItemLeft(
     img: String,
     favorite: Int,
     onAction: (actions: HomeScreenActions) -> Unit,
-    favoritesVM: FavoritesViewModel = hiltViewModel()
+    favoritesVM: FavoritesViewModel = hiltViewModel(),
+    detailsVM: DetailViewModel = hiltViewModel()
 ) {
     val bgColors = listOf<Color>(cardColorYellow, cardColorBlue, cardColorGreen, cardColorGreen)
     val cardBG = bgColors.random()
@@ -232,7 +235,10 @@ fun GridOfImageItemLeft(
             .size(120.dp, 150.dp)
             .background(color = cardBG, shape = RoundedCornerShape(16.dp))
             .clip(shape = RoundedCornerShape(16.dp))
-            .clickable { onAction(HomeScreenActions.Details) }
+            .clickable {
+                detailsVM.getDetails(name)
+                onAction(HomeScreenActions.Details)
+            }
     ) {
         Image(
             modifier = Modifier
@@ -272,14 +278,21 @@ fun GridOfImagesItemRight(
     img: String,
     favorite: Int,
     onAction: (actions: HomeScreenActions) -> Unit,
-    favoritesVM: FavoritesViewModel = hiltViewModel()
+    favoritesVM: FavoritesViewModel = hiltViewModel(),
+    detailsVM: DetailViewModel = hiltViewModel()
 ) {
+    val itemDetails = remember(detailsVM) { detailsVM.Clothe}
+    val details by itemDetails.observeAsState()
     Box(
         Modifier
             .size(120.dp, 180.dp)
             .background(color = cardColorBlue, shape = RoundedCornerShape(16.dp))
             .clip(shape = RoundedCornerShape(16.dp))
-            .clickable { onAction(HomeScreenActions.Details) }
+            .clickable {
+
+                detailsVM.getDetails(name)
+                onAction(HomeScreenActions.Details)
+            }
     ) {
         Image(
             modifier = Modifier
